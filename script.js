@@ -31,25 +31,47 @@ class Civilization{
         $(`#${resource}-count`).html(civ[`${increaseResource}`])
         //this is a check for first appearance of the hut button
         if(civ.wood >= 20){
-            this.firstWood = false;
+            civ.firstWood = false;
         }
-        if (this.firstWood == false){
+        if (civ.firstWood == false){
             $(".hut").show()
+        }
+        //disables and enables button if the player can/not afford the cost
+        if (civ.wood < 20 && civ.firstWood == false){
+            $("#hut-btn").addClass("is-disabled").prop("disabled", true)
+        }
+        if(civ.wood >= 20 && civ.firstWood == false){
+            $("#hut-btn").removeClass("is-disabled").prop("disabled", false)
         }
     }
     //used for creating buildings with a cost
     build(e) {
         e.preventDefault()
         let buildingID = e.data.id
-        console.log(buildingID)
         let findBuild = popBuildArr.find(x =>x.name === `${buildingID}`)
         let resource = findBuild.cost.name
-        civ[`${resource}`] = civ[`${resource}`] - findBuild.cost.price
-        findBuild.count++
-        console.log(civ[`${resource}`])
-        $(`#${resource}-count`).html(civ[`${resource}`])
-        $(".population").append(`<h4>${buildingID}:</h4><h5 id="${buildingID}-count">${findBuild.count}</h5>`)
+        if (civ[`${resource}`] >= findBuild.cost.price){
+            civ[`${resource}`] = civ[`${resource}`] - findBuild.cost.price
+            findBuild.count++
+        if (civ.wood <= 20 && civ.firstWood == false){
+            console.log("class lower than 20")
+            $("#hut-btn").addClass("is-disabled").prop("disabled", true)
+        }
+    
+            $(`#${resource}-count`).html(civ[`${resource}`])
+        $(`#${findBuild.name}-count`).html(`${findBuild.count}`)
+        } else {
+            return
+        }
+
         
+        
+       
+        if(popBuildArr[0].count >= 1){
+            $("#Hut-count").show()
+            $("#Hut").show()
+        }
+       
     }
 }
 
@@ -69,11 +91,12 @@ $(".wood").on("click", {id: "wood"}, civ.gatherResource)
 $(".stone").on("click", {id: "stone"}, civ.gatherResource)
 $(".iron").on("click", {id: "iron"}, civ.gatherResource)
 $(".food").on("click", {id: "food"}, civ.gatherResource)
+$(".hut").on("click", {id:"Hut"}, civ.build)
 
 if (resourceArr[0].count < 20 && civ.firstWood == true){
     $(".hut").hide()
-} else if(resourceArr[0].count < 20 && civ.firstWood == false){
-    $(".hut").attr("disabled", true)
 }
-
-$(".hut").on("click", {id:"Hut"}, civ.build)
+if(popBuildArr[0].count < 1){
+    $("#Hut-count").hide()
+    $("#Hut").hide()
+}
